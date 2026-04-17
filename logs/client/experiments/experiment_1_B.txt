@@ -1,0 +1,21 @@
+
+; <<>> DiG 9.18.48 <<>> @8.8.8.8 www.cc4303.bachmann.cl
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 62281
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;www.cc4303.bachmann.cl.		IN	A
+
+;; AUTHORITY SECTION:
+bachmann.cl.		1800	IN	SOA	ns1.digitalocean.com. hostmaster.bachmann.cl. 1716326403 10800 3600 604800 1800
+
+;; Query time: 175 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8) (UDP)
+;; WHEN: Thu Apr 16 22:10:45 -04 2026
+;; MSG SIZE  rcvd: 118
+

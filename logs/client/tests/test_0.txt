@@ -1,0 +1,31 @@
+
+; <<>> DiG 9.18.48 <<>> -p8000 @127.0.0.1 eol.uchile.cl
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 58118
+;; flags: qr aa rd; QUERY: 1, ANSWER: 9, AUTHORITY: 0, ADDITIONAL: 1
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+; COOKIE: b989d1ee2190b48e0100000069e1926a5cf0f2f4f6a58d75 (good)
+;; QUESTION SECTION:
+;eol.uchile.cl.			IN	A
+
+;; ANSWER SECTION:
+eol.uchile.cl.		3600	IN	CNAME	oeol-c.uchile.cl.
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.68
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.31
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.73
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.69
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.64
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.71
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.72
+oeol-c.uchile.cl.	3600	IN	A	146.83.63.74
+
+;; Query time: 172 msec
+;; SERVER: 127.0.0.1#8000(127.0.0.1) (UDP)
+;; WHEN: Thu Apr 16 21:52:42 -04 2026
+;; MSG SIZE  rcvd: 219
+

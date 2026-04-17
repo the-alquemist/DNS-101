@@ -1,0 +1,8 @@
+;; communications error to 127.0.0.1#8000: timed out
+;; communications error to 127.0.0.1#8000: timed out
+;; communications error to 127.0.0.1#8000: timed out
+
+; <<>> DiG 9.18.48 <<>> -p8000 @127.0.0.1 www.webofscience.com
+; (1 server found)
+;; global options: +cmd
+;; no servers could be reached

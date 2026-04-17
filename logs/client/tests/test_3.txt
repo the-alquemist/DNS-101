@@ -1,0 +1,22 @@
+
+; <<>> DiG 9.18.48 <<>> -p8000 @127.0.0.1 cc4303.bachmann.cl
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 44874
+;; flags: qr aa rd; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+;; QUESTION SECTION:
+;cc4303.bachmann.cl.		IN	A
+
+;; ANSWER SECTION:
+cc4303.bachmann.cl.	3600	IN	A	104.248.65.245
+
+;; Query time: 677 msec
+;; SERVER: 127.0.0.1#8000(127.0.0.1) (UDP)
+;; WHEN: Thu Apr 16 21:54:15 -04 2026
+;; MSG SIZE  rcvd: 63
+

@@ -1,0 +1,23 @@
+
+; <<>> DiG 9.18.48 <<>> -p8000 @127.0.0.1 www.uchile.cl
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 45389
+;; flags: qr aa rd; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+; COOKIE: 431b178163f092740100000069e192a8ed4c9967cbe8026b (good)
+;; QUESTION SECTION:
+;www.uchile.cl.			IN	A
+
+;; ANSWER SECTION:
+www.uchile.cl.		300	IN	A	200.89.76.36
+
+;; Query time: 167 msec
+;; SERVER: 127.0.0.1#8000(127.0.0.1) (UDP)
+;; WHEN: Thu Apr 16 21:53:44 -04 2026
+;; MSG SIZE  rcvd: 86
+
