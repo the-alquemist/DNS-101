@@ -1,113 +1,116 @@
-# DNS Resolver with Selective Cache
+# DNS Resolver — CC4303
+
+TCP/UDP networking project implementing a UDP-based iterative DNS resolver with selective popularity-based caching.
+
+---
 
 ## Overview
 
-This project implements a custom DNS resolver over UDP. It performs iterative resolution starting from a root DNS server and includes a selective caching mechanism based on query popularity.
+`resolver_v2.py`:
+
+- Receives DNS queries over UDP (`127.0.0.1:8000`)
+- Performs iterative resolution starting from a fixed root DNS server
+- Uses delegation (`NS`) and glue records (`A` in Additional)
+- Applies selective caching for the most frequent recent domains
 
 ---
 
-## a) Code Execution Flow
+## How It Works
 
-1. The program creates a UDP socket and listens on `127.0.0.1:8000`.
+### General Flow
 
-2. For each incoming message:
-   - Attempts to parse it as a DNS query.
-   - If parsing fails, the message is discarded.
-   - If successful, it extracts the queried domain (`qname`).
-
-3. Stores `qname` in `historial_consultas`.
-
-4. Computes a frequency-based ranking:
-   - Takes the last 20 queries.
-   - Determines the top 3 most frequent domains.
-
-5. Cache decision logic:
-   - If `qname` is in the top and exists in cache:
-     - If not expired (less than 60 seconds), responds from cache.
-     - If expired, resolves again and updates cache.
-   - If cache does not apply, resolves normally.
-   - Only stores results in cache if the domain belongs to the top.
-
-6. DNS resolution (core logic):
-   - Sends the query to the target server (initially root DNS `192.33.4.12`).
-   - If an `A` record is found in the Answer section, returns the response.
-   - If no `A` record is found:
-     - Looks for `NS` records in the Authority section.
-     - If none are found, resolution fails.
-     - If found:
-       - Attempts to use glue records (`A`) from the Additional section.
-       - If glue records exist, recursively queries the NS using its IP.
-       - If no glue records:
-         - Resolves the NS hostname first.
-         - Then queries the resolved NS.
-
-7. Before responding to the client:
-   - Adjusts the DNS message ID to match the original client query ID.
-   - Sends the response via UDP.
+1. Start UDP server socket and bind to `127.0.0.1:8000`.
+2. Receive incoming DNS packets from clients.
+3. Parse the packet into a DNS object:
+   - Invalid packets are ignored.
+   - Valid packets extract queried domain (`qname`).
+4. Append `qname` to query history.
+5. Compute popularity ranking:
+   - Last 20 queries
+   - Top 3 most frequent domains
+6. Apply cache policy:
+   - If domain is top-ranked and cached and not expired (`< 60s`), answer from cache.
+  - If cached but expired, resolve again and refresh cache.
+  - If not cached (or not in top-ranked set), resolve normally.
+  - Only store new entries when domain belongs to current top 3.
+7. Before replying to client:
+   - Restore original transaction ID.
+   - Send DNS response back through UDP.
+8. If resolution fails (no valid delegation/answer), no response is sent for that query.
 
 ---
 
-## b) How to Run
+### Resolution Strategy
 
-1. Navigate to the project directory.
-
-2. Create a fresh virtual environment:
-   ```bash
-   python3 -m venv .venv
-   ```
-
-3. Activate the virtual environment:
-   ```bash
-   source .venv/bin/activate
-   ```
-
-4. Install dependencies:
-   ```bash
-   pip install dnslib
-   ```
-
-5. Run the resolver:
-   ```bash
-   python resolver_v2.py
-   ```
-
-6. Test from another terminal:
-   ```bash
-   dig @127.0.0.1 -p 8000 www.example.com
-   ```
-
-### Notes
-
-- The process runs in a loop until interrupted with `Ctrl+C`.
-- The resolver listens on port `8000`.
-- Cache prioritizes popular domains and expires after 60 seconds.
+1. Send query to current DNS target (initially root DNS `192.33.4.12`).
+2. If Answer section contains an `A` record, resolution completes.
+3. If no `A` record:
+   - Check Authority section for `NS` records.
+   - If no `NS` exists, resolution fails.
+4. If `NS` records exist:
+   - Prefer glue `A` records from Additional and continue with that IP.
+   - If no glue is available, resolve NS hostname first, then retry original query using resolved NS IP.
+5. Upstream communication details:
+  - One-shot UDP queries with timeout (`3s`).
+  - DNS port `53` for upstream servers.
+  - Buffer size `4096` bytes.
 
 ---
 
-## c) Design Decisions
+## Usage
 
-1. **Use of UDP**
-   - Lower complexity and reduced overhead for typical DNS queries.
+### Environment Setup
 
-2. **Fixed Root DNS**
-   - Always starts from a known root server to control iterative resolution.
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install dnslib
+```
 
-3. **Iterative Resolution**
-   - Follows real DNS delegation flow using Authority and Additional sections instead of relying on the system resolver.
+### Run Resolver
 
-4. **Preference for Glue Records**
-   - Avoids extra queries when the Additional section provides IPs for name servers.
+```bash
+python resolver_v2.py
+```
 
-5. **Fallback Without Glue**
-   - Resolves the NS hostname when no glue records are available.
+### Test Query (from another terminal)
 
-6. **Selective Popularity-Based Cache**
-   - Only caches the top 3 domains from the last 20 queries.
-   - Reduces memory usage and prioritizes frequent domains.
+```bash
+dig @127.0.0.1 -p 8000 www.example.com
+```
 
-7. **Fixed Cache TTL (60s)**
-   - Simplifies expiration logic, though it does not use real DNS record TTL values.
+---
 
-8. **Full Response Caching**
-   - Stores complete DNS response bytes.
-   - Only adjusts the message ID when reusing cached responses.
+## Notes
+
+- Resolver listens on `127.0.0.1:8000`
+- Upstream DNS queries use port `53`
+- Root DNS bootstrap server is `192.33.4.12`
+- Upstream timeout is `3` seconds
+- UDP receive buffer is `4096` bytes
+- Cache TTL is fixed at `60` seconds
+- Caching applies only to domains in the top 3 of the last 20 queries
+- Query history used for ranking is stored continuously, but ranking uses a sliding window of the latest 20
+- Server runs continuously until interrupted (`Ctrl+C`)
+
+---
+
+## Key Design Choices
+
+- **Fixed root DNS bootstrap**
+  - Starts iterative resolution from a known root (`192.33.4.12`).
+
+- **Iterative delegation handling**
+  - Follows `NS` referrals directly instead of relying on system resolver recursion.
+
+- **Glue-first optimization**
+  - Uses Additional `A` records when available to avoid extra lookups.
+
+- **Fallback NS hostname resolution**
+  - Resolves name server hostnames when glue records are missing.
+
+- **Selective popularity-based caching**
+  - Caches only the most frequent domains to reduce memory usage.
+
+- **Full-response caching with ID fixup**
+  - Stores full DNS response bytes and rewrites transaction ID per client query.
